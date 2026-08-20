@@ -2,7 +2,7 @@ name: Greater Manchester Flood Monitoring Refresh
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "15 2 * * *"
 
   workflow_dispatch:
 
@@ -118,21 +118,3 @@ jobs:
           fi
 
           echo "Temporary firewall cleanup completed."
-
-      - name: Pause Azure SQL after refresh
-        if: always()
-        shell: bash
-        run: |
-          SUB="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-          RG="${{ vars.SQL_RESOURCE_GROUP }}"
-          SERVER="${{ vars.SQL_SERVER_NAME }}"
-          DB="${{ vars.SQL_DATABASE }}"
-
-          URL="https://management.azure.com/subscriptions/${SUB}/resourceGroups/${RG}/providers/Microsoft.Sql/servers/${SERVER}/databases/${DB}"
-
-          az rest \
-            --method POST \
-            --url "${URL}/pause?api-version=2025-01-01" \
-            --output none || true
-
-          echo "Azure SQL pause requested."
