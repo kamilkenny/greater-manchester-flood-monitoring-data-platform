@@ -1,0 +1,9 @@
+:r ddl/01_create_schemas.sql
+:r ddl/02_create_core_tables.sql
+:r staging/01_create_staging_tables.sql
+:r procedures/01_load_station_dimension.sql
+:r procedures/02_load_river_readings.sql
+:r procedures/03_load_flood_warnings.sql
+:r procedures/04_log_etl_execution.sql
+:r procedures/05_build_monitoring_summary.sql
+:r views/01_reporting_views.sql
