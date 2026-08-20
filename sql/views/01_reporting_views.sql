@@ -115,3 +115,18 @@ SELECT
     ErrorMessage
 FROM audit.ETLRunLog;
 GO
+
+CREATE OR ALTER VIEW dbo.vw_CurrentRiverLevels
+AS
+SELECT *
+FROM dbo.vw_CurrentStationStatus
+WHERE LOWER(Parameter) = 'level';
+GO
+
+
+CREATE OR ALTER VIEW dbo.vw_CurrentRainfall
+AS
+SELECT *
+FROM dbo.vw_CurrentStationStatus
+WHERE LOWER(Parameter) = 'rainfall';
+GO
