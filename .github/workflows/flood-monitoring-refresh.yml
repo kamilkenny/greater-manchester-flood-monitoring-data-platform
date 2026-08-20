@@ -18,7 +18,7 @@ jobs:
   refresh:
     name: Environment Agency to Azure SQL
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     env:
       SQL_SERVER: ${{ vars.SQL_SERVER }}
@@ -54,44 +54,6 @@ jobs:
           az account show \
             --query "{Subscription:name,State:state}" \
             --output table
-
-      - name: Resume Azure SQL
-        shell: bash
-        run: |
-          SUB="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-          RG="${{ vars.SQL_RESOURCE_GROUP }}"
-          SERVER="${{ vars.SQL_SERVER_NAME }}"
-          DB="${{ vars.SQL_DATABASE }}"
-
-          DB_URL="https://management.azure.com/subscriptions/${SUB}/resourceGroups/${RG}/providers/Microsoft.Sql/servers/${SERVER}/databases/${DB}"
-
-          az rest \
-            --method POST \
-            --url "${DB_URL}/resume?api-version=2025-01-01" \
-            --output none || true
-
-          echo "Waiting for Azure SQL to become Online..."
-
-          for attempt in {1..18}
-          do
-            STATUS=$(az rest \
-              --method GET \
-              --url "${DB_URL}?api-version=2025-01-01" \
-              --query "properties.status" \
-              --output tsv)
-
-            echo "Attempt ${attempt}: ${STATUS}"
-
-            if [ "${STATUS}" = "Online" ]; then
-              echo "Azure SQL is Online."
-              exit 0
-            fi
-
-            sleep 10
-          done
-
-          echo "Azure SQL did not become Online."
-          exit 1
 
       - name: Add temporary GitHub runner firewall rule
         id: firewall
@@ -156,21 +118,3 @@ jobs:
           fi
 
           echo "Temporary firewall cleanup completed."
-
-      - name: Pause Azure SQL
-        if: always()
-        shell: bash
-        run: |
-          SUB="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-          RG="${{ vars.SQL_RESOURCE_GROUP }}"
-          SERVER="${{ vars.SQL_SERVER_NAME }}"
-          DB="${{ vars.SQL_DATABASE }}"
-
-          DB_URL="https://management.azure.com/subscriptions/${SUB}/resourceGroups/${RG}/providers/Microsoft.Sql/servers/${SERVER}/databases/${DB}"
-
-          az rest \
-            --method POST \
-            --url "${DB_URL}/pause?api-version=2025-01-01" \
-            --output none || true
-
-          echo "Azure SQL pause requested."
