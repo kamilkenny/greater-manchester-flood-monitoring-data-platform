@@ -4,6 +4,7 @@ import csv
 import json
 import os
 import re
+import time
 from datetime import date, datetime
 from pathlib import Path
 
@@ -89,13 +90,33 @@ def _connection():
             + ", ".join(missing)
         )
 
-    return pymssql.connect(
-        server=os.environ["SQL_SERVER"],
-        user=os.environ["SQL_USER"],
-        password=os.environ["SQL_PASSWORD"],
-        database=os.environ["SQL_DATABASE"],
-        login_timeout=30,
-    )
+    last_error = None
+
+    for attempt in range(1, 13):
+        try:
+            return pymssql.connect(
+                server=os.environ["SQL_SERVER"],
+                user=os.environ["SQL_USER"],
+                password=os.environ["SQL_PASSWORD"],
+                database=os.environ["SQL_DATABASE"],
+                login_timeout=30,
+            )
+        except pymssql.Error as exc:
+            last_error = exc
+
+            if attempt == 12:
+                break
+
+            print(
+                "Azure SQL not ready, "
+                f"retrying in 10 seconds ({attempt}/12)..."
+            )
+
+            time.sleep(10)
+
+    raise RuntimeError(
+        "Unable to connect to Azure SQL after retries."
+    ) from last_error
 
 
 def deploy_sql(cursor) -> None:
