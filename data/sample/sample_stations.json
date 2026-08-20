@@ -1,0 +1,517 @@
+[
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115",
+    "RLOIid": "5197",
+    "catchmentName": "Upper Mersey",
+    "dateOpened": "2006-10-27",
+    "easting": 380508,
+    "label": "Northern Moor",
+    "lat": 53.407591,
+    "long": -2.294665,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/693115-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 390128,
+    "notation": "693115",
+    "riverName": "Baguley Brook",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115/stageScale/highestRecent",
+        "dateTime": "2012-12-21T01:30:00",
+        "value": 0.856
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115/stageScale/maxOnRecord",
+        "dateTime": "2025-01-01T06:30:00",
+        "value": 1.514
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115/stageScale/minOnRecord",
+        "dateTime": "2010-07-10T15:45:00",
+        "value": 0.065
+      },
+      "scaleMax": 1,
+      "typicalRangeHigh": 1.12,
+      "typicalRangeLow": 0.099
+    },
+    "stationReference": "693115",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Northern Moor",
+    "wiskiID": "693115"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690611",
+    "RLOIid": "5034",
+    "catchmentName": "Northern Manchester",
+    "dateOpened": "1995-04-27",
+    "easting": 384850,
+    "label": "Collyhurst Weir",
+    "lat": 53.493682,
+    "long": -2.229815,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/690611-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 399690,
+    "notation": "690611",
+    "riverName": "River Irk",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690611/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690611/stageScale/highestRecent",
+        "dateTime": "2010-10-03T11:15:00",
+        "value": 0.973
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690611/stageScale/maxOnRecord",
+        "dateTime": "2024-09-30T15:00:00",
+        "value": 1.954
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690611/stageScale/minOnRecord",
+        "dateTime": "2003-11-11T00:00:00",
+        "value": 0.08
+      },
+      "scaleMax": 2,
+      "typicalRangeHigh": 0.8,
+      "typicalRangeLow": 0.12
+    },
+    "stationReference": "690611",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Manchester",
+    "wiskiID": "690611"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690203",
+    "RLOIid": "5231",
+    "catchmentName": "Northern Manchester",
+    "dateOpened": "1993-02-26",
+    "easting": 388275,
+    "gridReference": "SD 88275 12740",
+    "label": "Rochdale",
+    "lat": 53.611067,
+    "long": -2.178685,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/690203-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 412740,
+    "notation": "690203",
+    "riverName": "River Roch",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690203/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690203/stageScale/highestRecent",
+        "dateTime": "2012-06-22T20:30:00",
+        "value": 1.614
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690203/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T13:30:00",
+        "value": 2.222
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690203/stageScale/minOnRecord",
+        "dateTime": "2010-06-15T23:30:00",
+        "value": 0.057
+      },
+      "scaleMax": 3,
+      "typicalRangeHigh": 1.8,
+      "typicalRangeLow": 0.098
+    },
+    "stationReference": "690203",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Rochdale",
+    "wiskiID": "690203"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693426",
+    "RLOIid": "5114",
+    "catchmentName": "Upper Mersey",
+    "dateOpened": "2008-03-21",
+    "easting": 390190,
+    "label": "Prestbury",
+    "lat": 53.289231,
+    "long": -2.148611,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/693426-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 376930,
+    "notation": "693426",
+    "riverName": "River Bollin",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693426/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693426/stageScale/highestRecent",
+        "dateTime": "2012-10-11T23:00:00",
+        "value": 2.126
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693426/stageScale/maxOnRecord",
+        "dateTime": "2016-09-13T17:45:00",
+        "value": 2.213
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693426/stageScale/minOnRecord",
+        "dateTime": "2013-07-27T17:45:00",
+        "value": 0.182
+      },
+      "scaleMax": 3,
+      "typicalRangeHigh": 1.18,
+      "typicalRangeLow": 0.247
+    },
+    "stationReference": "693426",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Prestbury",
+    "wiskiID": "693426"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1203",
+    "RLOIid": "8298",
+    "catchmentName": "Aire and Calder",
+    "dateOpened": "2002-12-03",
+    "easting": 408450,
+    "gridReference": "SE084223",
+    "label": "Copley Bridge",
+    "lat": 53.697959,
+    "long": -1.873488,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/L1203-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 422400,
+    "notation": "L1203",
+    "riverName": "River Calder",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1203/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1203/stageScale/highestRecent",
+        "dateTime": "2012-06-22T23:30:00",
+        "value": 4.547
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1203/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T15:00:00",
+        "value": 5.339
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1203/stageScale/minOnRecord",
+        "dateTime": "2006-07-28T15:45:00",
+        "value": -0.008
+      },
+      "scaleMax": 5,
+      "typicalRangeHigh": 3.8,
+      "typicalRangeLow": 1.68
+    },
+    "stationReference": "L1203",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Copley",
+    "wiskiID": "L1203"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/692423",
+    "RLOIid": "5112",
+    "catchmentName": "Upper Mersey",
+    "dateOpened": "1969-12-30",
+    "easting": 390700,
+    "label": "Portwood",
+    "lat": 53.42353,
+    "long": -2.141405,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/692423-level-stage-i-15_min----",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "---"
+      },
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/692423-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 391870,
+    "notation": "692423",
+    "riverName": "River Tame",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/692423/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/692423/stageScale/highestRecent",
+        "dateTime": "2012-07-06T21:00:00",
+        "value": 1.381
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/692423/stageScale/maxOnRecord",
+        "dateTime": "2025-01-01T08:30:00",
+        "value": 2.262
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/692423/stageScale/minOnRecord",
+        "dateTime": "1976-08-22T10:45:00",
+        "value": 0.073
+      },
+      "scaleMax": 3,
+      "typicalRangeHigh": 1.92,
+      "typicalRangeLow": 0.104
+    },
+    "stationReference": "692423",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Bredbury",
+    "wiskiID": "692423"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1231",
+    "RLOIid": "8152",
+    "catchmentName": "Aire and Calder",
+    "dateOpened": "2000-08-13",
+    "easting": 399400,
+    "label": "Nutclough",
+    "lat": 53.744763,
+    "long": -2.010569,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/L1231-level-stage-i-15_min----",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "---"
+      },
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/L1231-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 427600,
+    "notation": "L1231",
+    "riverName": "Hebden Water",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1231/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1231/stageScale/highestRecent",
+        "dateTime": "2012-06-22T20:30:00",
+        "value": 1.971
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1231/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T12:45:00",
+        "value": 2.615
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/L1231/stageScale/minOnRecord",
+        "dateTime": "2015-08-13T01:30:00",
+        "value": 0.112
+      },
+      "scaleMax": 2.5,
+      "typicalRangeHigh": 1.48,
+      "typicalRangeLow": 0.1
+    },
+    "stationReference": "L1231",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Hebden Bridge",
+    "wiskiID": "L1231"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690408",
+    "RLOIid": "5049",
+    "catchmentName": "Northern Manchester",
+    "dateOpened": "1976-06-29",
+    "easting": 374340,
+    "label": "Farnworth",
+    "lat": 53.557357,
+    "long": -2.388815,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/690408-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 406820,
+    "notation": "690408",
+    "riverName": "River Croal",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690408/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690408/stageScale/highestRecent",
+        "dateTime": "2012-06-22T18:00:00",
+        "value": 1.173
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690408/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T15:30:00",
+        "value": 1.826
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690408/stageScale/minOnRecord",
+        "dateTime": "1980-05-19T09:30:00",
+        "value": 0.05
+      },
+      "scaleMax": 2,
+      "typicalRangeHigh": 1,
+      "typicalRangeLow": 0.07
+    },
+    "stationReference": "690408",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Farnworth",
+    "wiskiID": "690408"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690250",
+    "RLOIid": "5230",
+    "catchmentName": "Northern Manchester",
+    "dateOpened": "2011-01-26",
+    "easting": 379100,
+    "gridReference": "SD 79100 07260",
+    "label": "Pioneer Mills",
+    "lat": 53.561524,
+    "long": -2.316991,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/690250-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 407260,
+    "notation": "690250",
+    "riverName": "River Irwell",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690250/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690250/stageScale/highestRecent",
+        "dateTime": "2012-06-22T23:45:00",
+        "value": 4.445
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690250/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T12:00:00",
+        "value": 5.922
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/690250/stageScale/minOnRecord",
+        "dateTime": "2011-05-11T06:15:00",
+        "value": 0.261
+      },
+      "scaleMax": 5,
+      "typicalRangeHigh": 3.7,
+      "typicalRangeLow": 0.362
+    },
+    "stationReference": "690250",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Radcliffe",
+    "wiskiID": "690250"
+  },
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/700325",
+    "RLOIid": "5152",
+    "catchmentName": "Ribble Douglas and Crossens",
+    "dateOpened": "1999-01-01",
+    "easting": 358620,
+    "label": "Wigan",
+    "lat": 53.54925,
+    "long": -2.625999,
+    "measures": [
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/700325-flow--i-15_min-m3_s",
+        "parameter": "flow",
+        "parameterName": "Flow",
+        "period": 900,
+        "qualifier": "",
+        "unitName": "m3/s"
+      },
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/700325-flow-logged-i-15_min-m3_s",
+        "parameter": "flow",
+        "parameterName": "Flow",
+        "period": 900,
+        "qualifier": "Logged",
+        "unitName": "m3/s"
+      },
+      {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/700325-level-stage-i-15_min-m",
+        "parameter": "level",
+        "parameterName": "Water Level",
+        "period": 900,
+        "qualifier": "Stage",
+        "unitName": "m"
+      }
+    ],
+    "northing": 406030,
+    "notation": "700325",
+    "riverName": "River Douglas",
+    "stageScale": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/700325/stageScale",
+      "highestRecent": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/700325/stageScale/highestRecent",
+        "dateTime": "2008-01-21T12:15:00",
+        "value": 1.517
+      },
+      "maxOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/700325/stageScale/maxOnRecord",
+        "dateTime": "2015-12-26T14:00:00",
+        "value": 2.55
+      },
+      "minOnRecord": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/700325/stageScale/minOnRecord",
+        "dateTime": "2004-06-17T10:15:00",
+        "value": 0.07
+      },
+      "scaleMax": 2,
+      "typicalRangeHigh": 1.35,
+      "typicalRangeLow": 0.094
+    },
+    "stationReference": "700325",
+    "status": "http://environment.data.gov.uk/flood-monitoring/def/core/statusActive",
+    "town": "Wigan",
+    "wiskiID": "700325"
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "@id": "http://environment.data.gov.uk/flood-monitoring/data/readings/693115-level-stage-i-15_min-m/2026-08-20T02-00-00Z",
+    "date": "2026-08-20",
+    "dateTime": "2026-08-20T02:00:00Z",
+    "measure": {
+      "@id": "http://environment.data.gov.uk/flood-monitoring/id/measures/693115-level-stage-i-15_min-m",
+      "parameter": "level",
+      "period": 900,
+      "qualifier": "Stage",
+      "station": {
+        "@id": "http://environment.data.gov.uk/flood-monitoring/id/stations/693115",
+        "label": "Northern Moor"
+      },
+      "stationReference": "693115",
+      "unitName": "m",
+      "valueType": "instantaneous"
+    },
+    "value": 0.219
+  }
+]

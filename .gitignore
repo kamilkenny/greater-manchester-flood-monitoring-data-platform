@@ -20,3 +20,4 @@ data/staging/*
 
 *.log
 logs/
+*.egg-info/
