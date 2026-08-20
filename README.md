@@ -1,32 +1,50 @@
 # Greater Manchester Flood & River Monitoring ETL & Reporting Platform
 
-An end to end environmental data engineering project using near real time Environment Agency flood monitoring data.
+![Flood Monitoring ETL](https://github.com/kamilkenny/greater-manchester-flood-monitoring-data-platform/actions/workflows/flood-monitoring-refresh.yml/badge.svg)
 
-## Core pipeline
+An end to end environmental data engineering and operational reporting platform for monitoring river levels, rainfall observations and flood warning information around Greater Manchester.
 
-Environment Agency API
-→ Python ingestion
-→ Raw snapshots
-→ Validation and staging
-→ SQL Server
-→ T SQL transformations
-→ Dimensional model
-→ SSIS orchestration
-→ SSRS operational reporting
+The platform collects Environment Agency flood monitoring data, preserves raw source snapshots, validates and transforms the data, loads an Azure SQL dimensional warehouse, records ETL execution information and prepares curated reporting views for SSRS.
 
-## Initial data domains
+## Project Status
 
-1. Monitoring stations
-2. River level and flow readings
-3. Flood warnings and alerts
-4. ETL execution and data quality monitoring
+**Cloud ETL platform: Operational**
 
-## Technology stack
+The Python, Azure SQL, T SQL and GitHub Actions components have been implemented and successfully tested in production.
 
-Python, SQL Server, T SQL, SSIS, SSMS, SSRS, GitHub and Microsoft Azure.
+SSIS and SSRS implementation specifications are included in the repository. Native Visual Studio SSIS and SSRS project artefacts are the remaining Microsoft desktop implementation phase.
 
-## Data source
+## Key Capabilities
 
-Environment Agency Real Time flood monitoring API.
+- Environment Agency API ingestion
+- Immutable JSON source snapshots
+- Automated data validation and quality checks
+- Normalised staging datasets
+- Azure SQL dimensional warehouse
+- T SQL stored procedures
+- Analytical reporting views
+- ETL execution auditing
+- GitHub Actions orchestration
+- Passwordless Azure OIDC authentication
+- Temporary runner specific SQL firewall access
+- Serverless Azure SQL automatic resume and auto pause
+- Automated testing with pytest
+- SSIS package design
+- SSRS operational dashboard design
 
-This project is intended for analytical, engineering and portfolio purposes and is not a replacement for official flood warning services.
+## Technology Stack
+
+| Layer | Technology |
+| --- | --- |
+| Source | Environment Agency Flood Monitoring API |
+| Ingestion | Python |
+| Transformation | Python, pandas |
+| Database | Azure SQL Database |
+| SQL Development | T SQL |
+| Orchestration | GitHub Actions |
+| Authentication | GitHub OIDC, Azure Managed Identity |
+| ETL | Python, SSIS specification |
+| Reporting | SQL views, SSRS specification |
+| Testing | pytest |
+| Version Control | Git, GitHub |
+| Cloud | Microsoft Azure |
