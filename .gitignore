@@ -21,3 +21,15 @@ data/staging/*
 *.log
 logs/
 *.egg-info/
+.vs/
+# Visual Studio / SSIS / SSRS local build artefacts
+**/bin/
+**/obj/
+*.user
+*.rsuser
+*.dtproj.backup
+*_BACKUP.dtsx
+
+# Visual Studio generated SSIS and SSRS cache files
+*.database
+*.rdl.data
