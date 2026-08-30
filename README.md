@@ -1,5 +1,6 @@
 # Greater Manchester Flood & River Monitoring Data Platform
-<img width="1315" height="1145" alt="WhatsApp Image 2026-08-30 at 4 04 15 AM (1)" src="https://github.com/user-attachments/assets/a2d357f9-6081-4154-8356-b6bc066f095f" />
+<img width="1567" height="1129" alt="WhatsApp Image 2026-08-30 at 4 04 15 AM" src="https://github.com/user-attachments/assets/bca66ede-cc5d-4403-93d5-16c3376b709a" />
+
 
 ![Flood Monitoring ETL](https://github.com/kamilkenny/greater-manchester-flood-monitoring-data-platform/actions/workflows/flood-monitoring-refresh.yml/badge.svg)
 
