@@ -1,154 +1,191 @@
-# Greater Manchester Flood & River Monitoring ETL & Reporting Platform
+# Greater Manchester Flood & River Monitoring Data Platform
 
 ![Flood Monitoring ETL](https://github.com/kamilkenny/greater-manchester-flood-monitoring-data-platform/actions/workflows/flood-monitoring-refresh.yml/badge.svg)
 
-An end to end environmental data engineering and operational reporting platform for monitoring river levels, rainfall observations and flood warning information around Greater Manchester.
+An end-to-end environmental data engineering, monitoring and operational intelligence platform for Greater Manchester.
 
-The platform collects Environment Agency flood monitoring data, preserves raw source snapshots, validates and transforms the data, loads an Azure SQL dimensional warehouse, records ETL execution information and prepares curated reporting views for SSRS.
+The platform collects near real-time river level, rainfall and flood warning information from the Environment Agency, preserves immutable source snapshots, performs automated validation and transformation, loads a dimensional Azure SQL data warehouse, records ETL execution history, and delivers interactive operational reporting through SSRS and Power BI Service.
+
+The project was designed as a practical demonstration of how cloud data engineering, SQL analytics and Microsoft reporting technologies can be combined to transform public environmental data into reliable, auditable and decision-ready information.
+
+---
 
 ## Project Status
 
-**Cloud ETL platform: Operational**
+### ✅ End-to-End Platform Operational
 
-The Python, Azure SQL, T SQL and GitHub Actions components have been implemented and successfully tested in production.
+The complete platform has now been implemented and tested across:
 
-SSIS and SSRS implementation specifications are included in the repository. Native Visual Studio SSIS and SSRS project artefacts are the remaining Microsoft desktop implementation phase.
-
-## Key Capabilities
-
-- Environment Agency API ingestion
-- Immutable JSON source snapshots
-- Automated data validation and quality checks
-- Normalised staging datasets
-- Azure SQL dimensional warehouse
-- T SQL stored procedures
-- Analytical reporting views
-- ETL execution auditing
+- Python data ingestion
+- Environment Agency API integration
+- automated data validation
+- immutable raw-data preservation
+- Azure SQL Database
+- dimensional data modelling
+- T-SQL stored procedures and analytical views
 - GitHub Actions orchestration
-- Passwordless Azure OIDC authentication
-- Temporary runner specific SQL firewall access
-- Serverless Azure SQL automatic resume and auto pause
-- Automated testing with pytest
-- SSIS package design
-- SSRS operational dashboard design
+- Azure OIDC authentication
+- SSIS ETL implementation
+- SSRS paginated reporting
+- Power BI Service deployment
+- automated testing and ETL auditing
 
-## Technology Stack
+The production pipeline can be executed manually or automatically through GitHub Actions, while the reporting layer connects to the curated Azure SQL warehouse.
+
+---
+
+# Why This Project Matters
+
+Flood and river monitoring information is operationally important, but raw environmental datasets are not automatically ready for decision-making.
+
+This project focuses on the engineering layer between **public data availability** and **usable operational intelligence**.
+
+It demonstrates how environmental monitoring data can be:
+
+1. collected automatically;
+2. preserved for traceability;
+3. validated before use;
+4. structured into analytical models;
+5. monitored for ETL quality and reliability;
+6. transformed into reporting-ready information;
+7. presented through interactive operational dashboards.
+
+The architecture is particularly relevant to public-sector and regional organisations that need reliable data pipelines to support environmental monitoring, resilience, infrastructure planning, place-based analysis and evidence-led decision-making.
+
+---
+
+# Greater Manchester Focus
+
+The platform monitors Environment Agency stations within a defined geographic radius around Greater Manchester.
+
+It provides an analytical view of:
+
+- river monitoring stations;
+- river-level observations;
+- rainfall measurements;
+- high river-level conditions;
+- active flood warnings;
+- latest monitoring readings;
+- changes in river conditions;
+- ETL performance and pipeline health.
+
+The project demonstrates how locally relevant public data can be engineered into a structured regional intelligence platform.
+
+---
+
+# Key Capabilities
+
+## Data Engineering
+
+- Automated Environment Agency API ingestion
+- Near real-time monitoring data retrieval
+- Immutable JSON source snapshots
+- Normalised staging datasets
+- Repeatable ETL execution
+- Dimensional warehouse design
+- Fact and dimension loading
+- Incremental operational refresh capability
+- Automated data-quality validation
+- ETL execution auditing
+
+## Cloud Engineering
+
+- Azure SQL Database
+- Serverless compute
+- Automatic database resume and auto-pause
+- GitHub Actions orchestration
+- Azure Managed Identity
+- GitHub OpenID Connect authentication
+- Temporary GitHub runner firewall access
+- Environment-based secret management
+
+## SQL Engineering
+
+- T-SQL staging logic
+- Stored procedures
+- Dimensional modelling
+- reporting views
+- data-quality queries
+- ETL audit tables
+- operational KPI calculations
+- analytical transformations
+
+## Microsoft Data Platform
+
+- SQL Server Integration Services (SSIS)
+- SQL Server Reporting Services (SSRS)
+- Visual Studio / SQL Server Data Tools
+- Azure SQL Database
+- Power BI Service paginated reporting
+
+## Reporting and Operational Intelligence
+
+- monitored station KPIs;
+- high river-level indicators;
+- active flood-warning summaries;
+- latest observation timestamps;
+- parameterised river selection;
+- river-level trend visualisation;
+- current station status;
+- flood-warning summary;
+- ETL health and execution metrics.
+
+---
+
+# Technology Stack
 
 | Layer | Technology |
 | --- | --- |
-| Source | Environment Agency Flood Monitoring API |
-| Ingestion | Python |
-| Transformation | Python, pandas |
-| Database | Azure SQL Database |
-| SQL Development | T SQL |
-| Orchestration | GitHub Actions |
-| Authentication | GitHub OIDC, Azure Managed Identity |
-| ETL | Python, SSIS specification |
-| Reporting | SQL views, SSRS specification |
+| Environmental Data Source | Environment Agency Flood Monitoring API |
+| Programming | Python |
+| Data Transformation | Python, pandas |
+| Cloud Database | Azure SQL Database |
+| SQL Development | T-SQL |
+| Data Modelling | Dimensional modelling / star-schema principles |
+| ETL | Python, SSIS |
+| Workflow Automation | GitHub Actions |
+| Cloud Authentication | GitHub OIDC, Azure Managed Identity |
+| Reporting | SSRS Paginated Reports |
+| Cloud Reporting | Power BI Service |
 | Testing | pytest |
-| Version Control | Git, GitHub |
-| Cloud | Microsoft Azure |
+| Source Control | Git, GitHub |
+| Development Environment | Visual Studio, SQL Server Data Tools |
+| Cloud Platform | Microsoft Azure |
 
-## Architecture
+---
 
-The detailed platform architecture is documented in `docs/architecture.md`.
+# Platform Architecture
 
-Core data flow:
+The platform follows a layered data-engineering architecture:
 
-Environment Agency API → Python ingestion → validation → staging → Azure SQL → T SQL procedures → reporting views → SSRS.
-
-Raw source snapshots are preserved separately from validated staging datasets.
-
-## Azure SQL Data Model
-
-The warehouse contains:
-
-- `dbo.DimStation`
-- `dbo.FactRiverReading`
-- `dbo.FactFloodWarning`
-- `audit.ETLRunLog`
-
-The reporting layer includes:
-
-- `dbo.vw_CurrentStationStatus`
-- `dbo.vw_CurrentRiverLevels`
-- `dbo.vw_CurrentRainfall`
-- `dbo.vw_HighRiverLevelStations`
-- `dbo.vw_FloodWarningSummary`
-- `dbo.vw_ETLPerformance`
-
-## Initial Validated Load
-
-The initial production deployment loaded:
-
-- 259 monitoring stations
-- 248 latest local readings
-- 0 duplicate stations
-- 0 duplicate readings
-- 0 orphan readings
-
-## Automation
-
-The production workflow is defined in:
-
-`.github/workflows/flood-monitoring-refresh.yml`
-
-The Azure SQL warehouse refresh is scheduled daily at **02:15 UTC**.
-
-Manual workflow execution is also available through GitHub Actions.
-
-The conservative daily cadence is intentional for the Azure SQL free serverless deployment. The ingestion architecture can support a higher refresh frequency when additional compute capacity is available.
-
-## Security
-
-GitHub Actions authenticates to Azure using:
-
-- GitHub OpenID Connect
-- Azure user assigned managed identity
-- Repository specific federated identity trust
-
-A temporary IP specific Azure SQL firewall rule is created for each GitHub hosted runner and removed after the ETL finishes.
-
-Database credentials are stored in GitHub Actions Secrets and are never committed to the repository.
-
-## Data Quality
-
-The pipeline checks duplicate records, missing metadata, missing coordinates, missing readings, measure coverage, orphan facts and ETL execution errors.
-
-Automated Python tests are executed using `pytest`.
-
-## SSIS Implementation
-
-The intended package is:
-
-`PKG_Load_Environment_Agency_Data.dtsx`
-
-The implementation specification is available at:
-
-`ssis/GM_Flood_Monitoring_ETL.md`
-
-The package design covers staging loads, dimensional transformations, stored procedure execution, audit logging and failure handling.
-
-## SSRS Reporting
-
-The intended report is:
-
-**Greater Manchester Flood & River Monitoring Dashboard**
-
-The specification is available at:
-
-`ssrs/GM_Flood_Monitoring_Dashboard.md`
-
-The dashboard design includes station status, river levels, rainfall, flood warnings, trends and ETL performance.
-
-## Current Project Status
-
-The Python, Azure SQL, T SQL and GitHub Actions cloud engineering platform is operational and has completed a successful automated production ETL run.
-
-Native Visual Studio SSIS `.dtsx` and SSRS `.rdl` artefacts remain the final desktop implementation phase.
-
-## Important Disclaimer
-
-This project is intended for research, learning and portfolio demonstration.
-
-It is not a replacement for official Environment Agency flood warning or emergency services.
+```text
+Environment Agency Flood Monitoring API
+                │
+                ▼
+        Python Data Ingestion
+                │
+                ▼
+      Immutable Raw Snapshots
+                │
+                ▼
+   Validation and Data Quality
+                │
+                ▼
+       Normalised Staging
+                │
+                ▼
+        Azure SQL Database
+                │
+       ┌────────┴────────┐
+       ▼                 ▼
+ T-SQL Procedures    ETL Audit Layer
+       │                 │
+       └────────┬────────┘
+                ▼
+       Reporting Views
+                │
+                ▼
+        SSRS Paginated Report
+                │
+                ▼
+        Power BI Service
