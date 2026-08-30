@@ -1,4 +1,5 @@
 # Greater Manchester Flood & River Monitoring Data Platform
+<img width="1315" height="1145" alt="WhatsApp Image 2026-08-30 at 4 04 15 AM (1)" src="https://github.com/user-attachments/assets/a2d357f9-6081-4154-8356-b6bc066f095f" />
 
 ![Flood Monitoring ETL](https://github.com/kamilkenny/greater-manchester-flood-monitoring-data-platform/actions/workflows/flood-monitoring-refresh.yml/badge.svg)
 
@@ -13,6 +14,10 @@ The project was designed as a practical demonstration of how cloud data engineer
 ## Project Status
 
 ### ✅ End-to-End Platform Operational
+<img width="1156" height="436" alt="WhatsApp Image 2026-08-30 at 4 05 53 AM (1)" src="https://github.com/user-attachments/assets/f4f06eec-bd97-417f-8ce5-46fe07358d33" />
+<img width="1490" height="528" alt="WhatsApp Image 2026-08-30 at 4 05 53 AM" src="https://github.com/user-attachments/assets/bc454018-b1e6-476c-b880-cebdc837f802" />
+<img width="1154" height="452" alt="WhatsApp Image 2026-08-30 at 4 05 55 AM" src="https://github.com/user-attachments/assets/cf1748ed-d088-4c43-b56e-e08d5c442659" />
+<img width="1152" height="697" alt="WhatsApp Image 2026-08-30 at 4 05 55 AM (1)" src="https://github.com/user-attachments/assets/0005ef9a-481c-4904-ad52-972be4f26631" />
 
 The complete platform has now been implemented and tested across:
 
