@@ -9,15 +9,15 @@
       <am:Name>SSDTRS</am:Name>
       <am:Version>18.9.12112.369</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2026-08-25T14:36:21.2548043Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-08-29T13:40:17.7914275Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <df:DefaultFontFamily>Segoe UI</df:DefaultFontFamily>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="GM_Flood_Monitoring_AzureSQL">
       <ConnectionProperties>
-        <DataProvider>SQL</DataProvider>
-        <ConnectString>Data Source=gm-flood-kamil-71493089.database.windows.net;Initial Catalog=gm_flood_monitoring</ConnectString>
+        <DataProvider>SQLAZURE</DataProvider>
+        <ConnectString>Data Source=gm-flood-kamil-71493089.database.windows.net;Initial Catalog=gm_flood_monitoring;Encrypt=True;TrustServerCertificate=False;</ConnectString>
       </ConnectionProperties>
       <rd:SecurityType>DataBase</rd:SecurityType>
       <rd:DataSourceID>601b4151-24ea-4dbc-ba29-13fb276683b1</rd:DataSourceID>
@@ -735,7 +735,7 @@ ORDER BY StartTimeUTC DESC;</CommandText>
             <Top>4.44934in</Top>
             <Left>0.26931in</Left>
             <Height>0.5in</Height>
-            <Width>6.59759in</Width>
+            <Width>6.5976in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1300,9 +1300,9 @@ Format(
               </Style>
             </ChartNoDataMessage>
             <DataSetName>DS_RiverTrend</DataSetName>
-            <Top>1.14269in</Top>
+            <Top>1.2633in</Top>
             <Left>0.42632in</Left>
-            <Height>2.81871in</Height>
+            <Height>1.4152in</Height>
             <Width>6.102in</Width>
             <ZIndex>7</ZIndex>
             <Style>

@@ -3,6 +3,7 @@
   <ConnectionProperties>
     <Extension>SQL</Extension>
     <ConnectString>Data Source=gm-flood-kamil-71493089.database.windows.net;Initial Catalog=gm_flood_monitoring;Connect Timeout=60</ConnectString>
+    <Prompt>Enter Azure SQL credentials</Prompt>
   </ConnectionProperties>
   <DataSourceID>c0a24673-c086-4140-9214-fb36e4e27abc</DataSourceID>
 </RptDataSource>
