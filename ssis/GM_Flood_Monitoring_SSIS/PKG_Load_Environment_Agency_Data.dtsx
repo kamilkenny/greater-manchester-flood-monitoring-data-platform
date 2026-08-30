@@ -11,8 +11,8 @@
   DTS:LocaleID="2057"
   DTS:ObjectName="Package"
   DTS:PackageType="5"
-  DTS:VersionBuild="58"
-  DTS:VersionGUID="{59BB1C6F-5D54-4122-BB0F-44E1B8AC6D22}">
+  DTS:VersionBuild="59"
+  DTS:VersionGUID="{15415E17-5B8F-4165-AE8C-AD640F049A31}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -26,7 +26,11 @@
           DTS:ConnectRetryCount="1"
           DTS:ConnectRetryInterval="5"
           DTS:ConnectionString="Data Source=gm-flood-kamil-71493089.database.windows.net;User ID=gmfloodadmin;Initial Catalog=gm_flood_monitoring;Provider=MSOLEDBSQL.1;Persist Security Info=True;Auto Translate=False;Application Name=SSIS-Package-{56B8076A-B61A-4EEC-922E-FDEE3BC5257E}gm-flood-kamil-71493089.database.windows.net.gm_flood_monitoring.gmfloodadm;">
-          </DTS:ConnectionManager>
+          <DTS:Password
+            DTS:Name="Password"
+            Sensitive="1"
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAMPHrAnKksUC6c0ysGe+qAwAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAADbPGegjsrRnjvGs7AbYLH+5kGdfIBP4srKjmHrx/us/QAAAAAOgAAAAAIAACAAAAA3Uk1LaZKyxXu38pmMz4kdeBhqx1Fy2IImDpc3a8VkKSAAAABMz7owY+hgXEXRDDE6hXibZPq29j+QDwWFNd+Z0GpyCkAAAAD8xi4MRPonjCCipEeAP3584SnqykSEHJAyrXKzucz6Zko3OZGNMiDMJD8cdjBtE3ao6KBQMyqgMiMIx3L4csAz</DTS:Password>
+        </DTS:ConnectionManager>
       </DTS:ObjectData>
     </DTS:ConnectionManager>
     <DTS:ConnectionManager
