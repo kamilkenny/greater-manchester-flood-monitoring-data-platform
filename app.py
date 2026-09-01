@@ -177,7 +177,9 @@ def _architecture_node(label: str, caption: str) -> html.Div:
 
 def build_station_map(current: pd.DataFrame) -> go.Figure:
     if current.empty:
-        return _empty_figure("Station locations will appear when live data is available.")
+        return _empty_figure(
+            "Station locations will appear when live data is available."
+        )
 
     frame = current.copy()
     frame["Latitude"] = pd.to_numeric(frame.get("Latitude"), errors="coerce")
@@ -185,7 +187,9 @@ def build_station_map(current: pd.DataFrame) -> go.Figure:
     frame = frame.dropna(subset=["Latitude", "Longitude"])
 
     if frame.empty:
-        return _empty_figure("No geocoded monitoring stations are available.")
+        return _empty_figure(
+            "No geocoded monitoring stations are available."
+        )
 
     frame = (
         frame.sort_values("ReadingDateTimeUTC")
@@ -193,19 +197,34 @@ def build_station_map(current: pd.DataFrame) -> go.Figure:
         .copy()
     )
 
-    status = frame.get("CurrentStatus", pd.Series("", index=frame.index)).fillna("")
-    marker_colour = [
-        "#ff6b6b"
-        if "ABOVE" in str(item).upper()
-        else "#ffbf69"
-        if "ELEVATED" in str(item).upper()
-        else "#55d6be"
-        for item in status
-    ]
+    status = (
+        frame.get("CurrentStatus", pd.Series("", index=frame.index))
+        .fillna("")
+        .astype(str)
+        .str.upper()
+    )
 
-    customdata = []
-    for _, row in frame.iterrows():
-        customdata.append(
+    frame["MapStatus"] = "Normal"
+    frame.loc[status.str.contains("ELEVATED"), "MapStatus"] = "Elevated"
+    frame.loc[status.str.contains("ABOVE"), "MapStatus"] = "Above typical"
+
+    styles = {
+        "Normal": ("#087E8B", 8),
+        "Elevated": ("#D59A32", 13),
+        "Above typical": ("#B93A3A", 16),
+    }
+
+    figure = go.Figure()
+
+    for status_name in ("Normal", "Elevated", "Above typical"):
+        subset = frame[frame["MapStatus"] == status_name]
+
+        if subset.empty:
+            continue
+
+        colour, size = styles[status_name]
+
+        customdata = [
             [
                 _safe_text(row.get("StationName")),
                 _safe_text(row.get("RiverName")),
@@ -214,42 +233,60 @@ def build_station_map(current: pd.DataFrame) -> go.Figure:
                 _safe_text(row.get("UnitName"), ""),
                 _safe_text(row.get("CurrentStatus")),
             ]
-        )
+            for _, row in subset.iterrows()
+        ]
 
-    figure = go.Figure(
-        go.Scattermap(
-            lat=frame["Latitude"],
-            lon=frame["Longitude"],
-            mode="markers",
-            marker={
-                "size": 12,
-                "color": marker_colour,
-                "opacity": 0.9,
-            },
-            customdata=customdata,
-            hovertemplate=(
-                "<b>%{customdata[0]}</b><br>"
-                "%{customdata[1]} · %{customdata[2]}<br>"
-                "Latest: %{customdata[3]} %{customdata[4]}<br>"
-                "Status: %{customdata[5]}"
-                "<extra></extra>"
-            ),
+        figure.add_trace(
+            go.Scattermap(
+                lat=subset["Latitude"],
+                lon=subset["Longitude"],
+                mode="markers",
+                name=status_name,
+                marker={
+                    "size": size,
+                    "color": colour,
+                    "opacity": 0.88,
+                },
+                customdata=customdata,
+                hovertemplate=(
+                    "<b>%{customdata[0]}</b><br>"
+                    "%{customdata[1]} · %{customdata[2]}<br><br>"
+                    "Latest: %{customdata[3]} %{customdata[4]}<br>"
+                    "Condition: %{customdata[5]}"
+                    "<extra></extra>"
+                ),
+            )
         )
-    )
 
     figure.update_layout(
         map={
-            "style": "carto-darkmatter",
+            "style": "carto-positron",
             "center": {
                 "lat": float(frame["Latitude"].mean()),
                 "lon": float(frame["Longitude"].mean()),
             },
-            "zoom": 8.4,
+            "zoom": 8.45,
         },
+        height=500,
+        margin={"l": 0, "r": 0, "t": 10, "b": 0},
         paper_bgcolor="rgba(0,0,0,0)",
-        margin={"l": 0, "r": 0, "t": 0, "b": 0},
-        height=420,
-        showlegend=False,
+        showlegend=True,
+        legend={
+            "orientation": "h",
+            "y": 1.02,
+            "x": 0,
+            "font": {"size": 11, "color": "#3E565B"},
+            "bgcolor": "rgba(255,255,255,0.90)",
+        },
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#12262B",
+        },
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "font": {"color": "#12262B"},
+            "bordercolor": "#DCE5E2",
+        },
     )
 
     return figure
@@ -257,89 +294,248 @@ def build_station_map(current: pd.DataFrame) -> go.Figure:
 
 def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
     if rainfall.empty:
-        return _empty_figure("Rainfall observations will appear after the next successful refresh.")
+        return _empty_figure(
+            "Rainfall observations will appear after the next successful refresh."
+        )
 
     frame = rainfall.copy()
-    frame["CurrentValue"] = pd.to_numeric(frame["CurrentValue"], errors="coerce")
-    frame = frame.dropna(subset=["CurrentValue"]).head(12)
+
+    frame["CurrentValue"] = pd.to_numeric(
+        frame["CurrentValue"],
+        errors="coerce",
+    )
+
+    frame = (
+        frame.dropna(subset=["CurrentValue"])
+        .sort_values("CurrentValue", ascending=False)
+        .head(12)
+        .copy()
+    )
 
     if frame.empty:
-        return _empty_figure("No rainfall values are available.")
+        return _empty_figure(
+            "No rainfall values are available."
+        )
 
-    labels = frame["StationName"].fillna("Unknown station").astype(str)
+    labels = (
+        frame["StationName"]
+        .fillna("Unknown station")
+        .astype(str)
+    )
+
+    colours = []
+
+    for rank in range(len(frame)):
+        if rank < 3:
+            colours.append("#087E8B")
+        elif rank < 7:
+            colours.append("#27A7B8")
+        else:
+            colours.append("#9CCFD4")
+
     figure = go.Figure(
         go.Bar(
             x=frame["CurrentValue"],
             y=labels,
             orientation="h",
             marker={
-                "color": frame["CurrentValue"],
-                "colorscale": [
-                    [0.0, "#25445d"],
-                    [0.5, "#3b82f6"],
-                    [1.0, "#4dd9ff"],
-                ],
-                "line": {"width": 0},
+                "color": colours,
+                "line": {
+                    "color": "rgba(8,126,139,0.15)",
+                    "width": 1,
+                },
             },
-            customdata=frame[["Town", "UnitName"]].fillna("").values,
+            text=[
+                f"{value:.2f}"
+                for value in frame["CurrentValue"]
+            ],
+            textposition="outside",
+            textfont={
+                "color": "#3E565B",
+                "size": 10,
+            },
+            customdata=frame[
+                ["Town", "UnitName"]
+            ].fillna("").values,
             hovertemplate=(
                 "<b>%{y}</b><br>"
-                "%{customdata[0]}<br>"
-                "%{x:.2f} %{customdata[1]}"
+                "%{customdata[0]}<br><br>"
+                "Latest rainfall: %{x:.2f} %{customdata[1]}"
                 "<extra></extra>"
             ),
         )
     )
 
-    layout = _chart_layout(height=390)
-    layout["yaxis"] = {
-        "autorange": "reversed",
-        "showgrid": False,
-        "tickfont": {"color": "#b8c8d8", "size": 11},
-    }
-    layout["xaxis"]["title"] = "Latest rainfall reading"
-    figure.update_layout(**layout)
+    median_value = frame["CurrentValue"].median()
+
+    if pd.notna(median_value):
+        figure.add_vline(
+            x=float(median_value),
+            line_width=1,
+            line_dash="dot",
+            line_color="#8AA09D",
+        )
+
+    figure.update_layout(
+        height=430,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#FFFFFF",
+        margin={
+            "l": 10,
+            "r": 44,
+            "t": 18,
+            "b": 42,
+        },
+        bargap=0.32,
+        showlegend=False,
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#12262B",
+        },
+        xaxis={
+            "title": "Latest rainfall reading",
+            "showgrid": True,
+            "gridcolor": "#E7EEEC",
+            "zeroline": False,
+            "tickfont": {
+                "color": "#617276",
+                "size": 10,
+            },
+        },
+        yaxis={
+            "autorange": "reversed",
+            "showgrid": False,
+            "tickfont": {
+                "color": "#31494D",
+                "size": 11,
+            },
+        },
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "font": {
+                "color": "#12262B",
+            },
+            "bordercolor": "#DCE5E2",
+        },
+    )
+
     return figure
 
 
 def build_warning_chart(warnings: pd.DataFrame) -> go.Figure:
     if warnings.empty:
-        return _empty_figure("Flood warning summary is not currently available.")
+        return _empty_figure(
+            "Flood warning summary is not currently available."
+        )
 
     frame = warnings.copy()
-    frame["WarningCount"] = pd.to_numeric(frame["WarningCount"], errors="coerce").fillna(0)
-    frame = frame[frame["WarningCount"] >= 0]
+
+    frame["WarningCount"] = pd.to_numeric(
+        frame["WarningCount"],
+        errors="coerce",
+    ).fillna(0)
+
+    frame = frame[frame["WarningCount"] >= 0].copy()
 
     if frame.empty:
-        return _empty_figure("No warning summary records are available.")
+        return _empty_figure(
+            "No warning summary records are available."
+        )
+
+    if "SeverityLevel" in frame.columns:
+        frame["SeverityLevel"] = pd.to_numeric(
+            frame["SeverityLevel"],
+            errors="coerce",
+        )
+
+        frame = frame.sort_values(
+            ["SeverityLevel", "WarningCount"],
+            ascending=[True, False],
+        )
 
     colours = []
+
     for severity in frame["Severity"].fillna("").astype(str):
-        text = severity.lower()
-        if "severe" in text:
-            colours.append("#ff5c5c")
-        elif "warning" in text:
-            colours.append("#ff9f43")
-        elif "alert" in text:
-            colours.append("#ffd166")
+        text_value = severity.lower()
+
+        if "severe" in text_value:
+            colours.append("#9F2929")
+        elif "warning" in text_value:
+            colours.append("#C96832")
+        elif "alert" in text_value:
+            colours.append("#D59A32")
         else:
-            colours.append("#58a6ff")
+            colours.append("#557A55")
 
     figure = go.Figure(
         go.Bar(
-            x=frame["Severity"],
-            y=frame["WarningCount"],
-            marker={"color": colours},
+            x=frame["WarningCount"],
+            y=frame["Severity"],
+            orientation="h",
+            marker={
+                "color": colours,
+                "line": {
+                    "color": "rgba(18,38,43,0.08)",
+                    "width": 1,
+                },
+            },
             text=frame["WarningCount"].astype(int),
             textposition="outside",
-            hovertemplate="<b>%{x}</b><br>%{y} current records<extra></extra>",
+            textfont={
+                "color": "#12262B",
+                "size": 13,
+            },
+            hovertemplate=(
+                "<b>%{y}</b><br>"
+                "%{x} current warning records"
+                "<extra></extra>"
+            ),
         )
     )
 
-    layout = _chart_layout(height=330)
-    layout["xaxis"]["tickangle"] = -8
-    layout["yaxis"]["title"] = "Warning count"
-    figure.update_layout(**layout)
+    figure.update_layout(
+        height=330,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#FFFFFF",
+        margin={
+            "l": 10,
+            "r": 48,
+            "t": 16,
+            "b": 38,
+        },
+        bargap=0.36,
+        showlegend=False,
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#12262B",
+        },
+        xaxis={
+            "title": "Current records",
+            "showgrid": True,
+            "gridcolor": "#EEE6E2",
+            "zeroline": False,
+            "tickfont": {
+                "color": "#617276",
+                "size": 10,
+            },
+        },
+        yaxis={
+            "autorange": "reversed",
+            "showgrid": False,
+            "tickfont": {
+                "color": "#31494D",
+                "size": 11,
+            },
+        },
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "font": {
+                "color": "#12262B",
+            },
+            "bordercolor": "#E5D7D1",
+        },
+    )
+
     return figure
 
 
@@ -348,58 +544,220 @@ def build_river_history_chart(
     history: pd.DataFrame,
 ) -> go.Figure:
     if not river_name:
-        return _empty_figure("Choose a river to explore its recent level history.")
+        return _empty_figure(
+            "Choose a river to explore its recent level history."
+        )
 
     if history.empty:
-        return _empty_figure(f"No historical level readings were returned for {river_name}.")
+        return _empty_figure(
+            f"No historical level readings were returned for {river_name}."
+        )
 
     frame = history.copy()
+
     frame["ReadingDateTimeUTC"] = pd.to_datetime(
         frame["ReadingDateTimeUTC"],
         errors="coerce",
         utc=True,
     )
-    frame["ReadingValue"] = pd.to_numeric(frame["ReadingValue"], errors="coerce")
-    frame = frame.dropna(subset=["ReadingDateTimeUTC", "ReadingValue"])
-    frame = frame.sort_values("ReadingDateTimeUTC")
+
+    frame["ReadingValue"] = pd.to_numeric(
+        frame["ReadingValue"],
+        errors="coerce",
+    )
+
+    frame["TypicalRangeLow"] = pd.to_numeric(
+        frame.get("TypicalRangeLow"),
+        errors="coerce",
+    )
+
+    frame["TypicalRangeHigh"] = pd.to_numeric(
+        frame.get("TypicalRangeHigh"),
+        errors="coerce",
+    )
+
+    frame = frame.dropna(
+        subset=[
+            "ReadingDateTimeUTC",
+            "ReadingValue",
+        ]
+    ).sort_values("ReadingDateTimeUTC")
 
     if frame.empty:
-        return _empty_figure(f"No valid historical level readings were returned for {river_name}.")
+        return _empty_figure(
+            f"No valid historical level readings were returned for {river_name}."
+        )
 
     figure = go.Figure()
 
-    for station_name, station_frame in frame.groupby("StationName", dropna=False):
-        station_frame = station_frame.tail(400)
+    palette = [
+        "#087E8B",
+        "#557A55",
+        "#27A7B8",
+        "#766A8A",
+        "#9B704A",
+        "#3F6E73",
+    ]
+
+    station_groups = list(
+        frame.groupby("StationName", dropna=False)
+    )
+
+    for index, (station_name, station_frame) in enumerate(station_groups):
+        station_frame = (
+            station_frame
+            .tail(400)
+            .sort_values("ReadingDateTimeUTC")
+            .copy()
+        )
+
+        colour = palette[index % len(palette)]
+
+        valid_low = station_frame["TypicalRangeLow"].dropna()
+        valid_high = station_frame["TypicalRangeHigh"].dropna()
+
+        if not valid_low.empty and not valid_high.empty:
+            typical_low = float(valid_low.median())
+            typical_high = float(valid_high.median())
+
+            if typical_high > typical_low:
+                x_values = station_frame["ReadingDateTimeUTC"]
+
+                figure.add_trace(
+                    go.Scatter(
+                        x=x_values,
+                        y=[typical_high] * len(station_frame),
+                        mode="lines",
+                        line={"width": 0},
+                        hoverinfo="skip",
+                        showlegend=False,
+                    )
+                )
+
+                figure.add_trace(
+                    go.Scatter(
+                        x=x_values,
+                        y=[typical_low] * len(station_frame),
+                        mode="lines",
+                        line={"width": 0},
+                        fill="tonexty",
+                        fillcolor="rgba(39,167,184,0.055)",
+                        hoverinfo="skip",
+                        showlegend=False,
+                    )
+                )
+
         figure.add_trace(
             go.Scatter(
                 x=station_frame["ReadingDateTimeUTC"],
                 y=station_frame["ReadingValue"],
                 mode="lines",
-                name=_safe_text(station_name, "Unknown station"),
-                line={"width": 2},
+                name=_safe_text(
+                    station_name,
+                    "Unknown station",
+                ),
+                line={
+                    "width": 2.5,
+                    "color": colour,
+                },
                 hovertemplate=(
                     "<b>%{fullData.name}</b><br>"
                     "%{x|%d %b %Y, %H:%M}<br>"
-                    "%{y:.3f}<extra></extra>"
+                    "River level: %{y:.3f}"
+                    "<extra></extra>"
                 ),
             )
         )
 
-    layout = _chart_layout(
-        title=f"{river_name} · recent level observations",
-        height=420,
-        showlegend=True,
+        latest = station_frame.iloc[-1]
+
+        figure.add_trace(
+            go.Scatter(
+                x=[latest["ReadingDateTimeUTC"]],
+                y=[latest["ReadingValue"]],
+                mode="markers",
+                marker={
+                    "size": 10,
+                    "color": colour,
+                    "line": {
+                        "color": "#FFFFFF",
+                        "width": 2,
+                    },
+                },
+                hovertemplate=(
+                    "<b>Latest observation</b><br>"
+                    "%{x|%d %b %Y, %H:%M}<br>"
+                    "%{y:.3f}"
+                    "<extra></extra>"
+                ),
+                showlegend=False,
+            )
+        )
+
+    figure.update_layout(
+        title={
+            "text": f"{river_name} · recent level observations",
+            "x": 0,
+            "xanchor": "left",
+            "font": {
+                "size": 15,
+                "color": "#12262B",
+            },
+        },
+        height=440,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#FFFFFF",
+        margin={
+            "l": 58,
+            "r": 25,
+            "t": 68,
+            "b": 52,
+        },
+        hovermode="x unified",
+        font={
+            "family": "Inter, Segoe UI, sans-serif",
+            "color": "#12262B",
+        },
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "right",
+            "x": 1,
+            "font": {
+                "size": 10,
+                "color": "#4B6266",
+            },
+        },
+        xaxis={
+            "showgrid": False,
+            "zeroline": False,
+            "linecolor": "#DCE5E2",
+            "tickfont": {
+                "color": "#617276",
+                "size": 10,
+            },
+        },
+        yaxis={
+            "title": "River level",
+            "showgrid": True,
+            "gridcolor": "#E7EEEC",
+            "gridwidth": 1,
+            "zeroline": False,
+            "linecolor": "#DCE5E2",
+            "tickfont": {
+                "color": "#617276",
+                "size": 10,
+            },
+        },
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "font": {
+                "color": "#12262B",
+            },
+            "bordercolor": "#DCE5E2",
+        },
     )
-    layout["legend"] = {
-        "orientation": "h",
-        "yanchor": "bottom",
-        "y": 1.02,
-        "xanchor": "right",
-        "x": 1,
-        "font": {"size": 10, "color": "#9fb2c6"},
-    }
-    layout["yaxis"]["title"] = "River level"
-    figure.update_layout(**layout)
 
     return figure
 
