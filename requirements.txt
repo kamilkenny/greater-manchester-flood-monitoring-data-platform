@@ -3,3 +3,6 @@ pandas>=2.2
 python-dotenv>=1.0
 pytest>=8.0
 pymssql>=2.3
+dash>=3.0
+plotly>=6.0
+gunicorn>=23.0
