@@ -1,5 +1,12 @@
 # Greater Manchester Flood & River Monitoring Data Platform
 
+
+## Public Flood Intelligence Dashboard
+
+**Greater Manchester Flood & River Intelligence**
+
+## https://gm-flood-intelligence-kamil-898341.azurewebsites.net/
+
 <img width="1567" height="1129" alt="Greater Manchester Flood Monitoring Platform" src="https://github.com/user-attachments/assets/bca66ede-cc5d-4403-93d5-16c3376b709a" />
 
 <img width="1672" height="941" alt="Greater Manchester Flood Monitoring Intelligence" src="https://github.com/user-attachments/assets/068c3860-2ea4-4565-a8bf-8e58ca3665c9" />
@@ -7,10 +14,6 @@
 <img width="1887" height="888" alt="Screenshot 2026-09-02 011707" src="https://github.com/user-attachments/assets/476a8bb3-a783-4acf-9edb-f702e000d4e8" />
 
 ## Live Platform
-
-## Public Flood Intelligence Dashboard
-
-**Greater Manchester Flood & River Intelligence**
 
 ## https://gm-flood-intelligence-kamil-898341.azurewebsites.net/
 
