@@ -50,6 +50,20 @@ The live application provides operational visibility of:
 - ETL execution health;
 - pipeline refresh status.
 
+
+# Engineering Achievement
+
+This project was developed as a **production-style environmental data platform**, rather than as a standalone visualisation exercise.
+
+The main engineering achievement was designing and implementing a complete pathway from raw public environmental data to reliable operational intelligence.
+
+The platform demonstrates:
+
+**API ingestion → raw-data preservation → validation → staging → transformation → dimensional modelling → Azure SQL → orchestration → monitoring → reporting → cloud deployment**
+
+This architecture allows the same governed data layer to support multiple downstream consumers without reproducing transformation logic independently inside each reporting application.
+
+---
 ---
 
 # Project Status
@@ -91,19 +105,7 @@ The production-style pipeline can be executed manually or automatically through 
 
 ---
 
-# Engineering Achievement
 
-This project was developed as a **production-style environmental data platform**, rather than as a standalone visualisation exercise.
-
-The main engineering achievement was designing and implementing a complete pathway from raw public environmental data to reliable operational intelligence.
-
-The platform demonstrates:
-
-**API ingestion → raw-data preservation → validation → staging → transformation → dimensional modelling → Azure SQL → orchestration → monitoring → reporting → cloud deployment**
-
-This architecture allows the same governed data layer to support multiple downstream consumers without reproducing transformation logic independently inside each reporting application.
-
----
 
 # Why This Project Matters
 
