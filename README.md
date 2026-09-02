@@ -4,6 +4,9 @@
 
 <img width="1672" height="941" alt="Greater Manchester Flood Monitoring Intelligence" src="https://github.com/user-attachments/assets/068c3860-2ea4-4565-a8bf-8e58ca3665c9" />
 
+<img width="1887" height="888" alt="Screenshot 2026-09-02 011707" src="https://github.com/user-attachments/assets/476a8bb3-a783-4acf-9edb-f702e000d4e8" />
+
+
 ![Flood Monitoring ETL](https://github.com/kamilkenny/greater-manchester-flood-monitoring-data-platform/actions/workflows/flood-monitoring-refresh.yml/badge.svg)
 
 ## Greater Manchester Flood & River Intelligence
