@@ -295,7 +295,7 @@ def build_station_map(current: pd.DataFrame) -> go.Figure:
 def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
     if rainfall.empty:
         return _empty_figure(
-            "Rainfall observations will appear after the next successful refresh."
+            "Rainfall observations are not currently available."
         )
 
     frame = rainfall.copy()
@@ -305,17 +305,64 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
         errors="coerce",
     )
 
-    frame = (
-        frame.dropna(subset=["CurrentValue"])
-        .sort_values("CurrentValue", ascending=False)
-        .head(12)
-        .copy()
-    )
+    frame = frame.dropna(subset=["CurrentValue"]).copy()
 
     if frame.empty:
         return _empty_figure(
-            "No rainfall values are available."
+            "No valid rainfall observations are currently available."
         )
+
+    # If every reporting station is currently at zero, do not draw
+    # a meaningless bar chart.
+    if float(frame["CurrentValue"].max()) <= 0:
+        figure = go.Figure()
+
+        figure.add_annotation(
+            x=0.5,
+            y=0.60,
+            xref="paper",
+            yref="paper",
+            text="<b>No measurable rainfall detected</b>",
+            showarrow=False,
+            font={
+                "size": 22,
+                "color": "#12262B",
+            },
+        )
+
+        figure.add_annotation(
+            x=0.5,
+            y=0.43,
+            xref="paper",
+            yref="paper",
+            text=(
+                "Latest monitoring station observations "
+                "are currently reporting 0.00."
+            ),
+            showarrow=False,
+            font={
+                "size": 13,
+                "color": "#617276",
+            },
+        )
+
+        figure.update_layout(
+            height=300,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#FFFFFF",
+            margin={"l": 20, "r": 20, "t": 20, "b": 20},
+            xaxis={"visible": False},
+            yaxis={"visible": False},
+        )
+
+        return figure
+
+    frame = (
+        frame[frame["CurrentValue"] > 0]
+        .sort_values("CurrentValue", ascending=False)
+        .head(10)
+        .copy()
+    )
 
     labels = (
         frame["StationName"]
@@ -326,12 +373,12 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
     colours = []
 
     for rank in range(len(frame)):
-        if rank < 3:
+        if rank == 0:
             colours.append("#087E8B")
-        elif rank < 7:
+        elif rank < 4:
             colours.append("#27A7B8")
         else:
-            colours.append("#9CCFD4")
+            colours.append("#A6D6DA")
 
     figure = go.Figure(
         go.Bar(
@@ -340,10 +387,7 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
             orientation="h",
             marker={
                 "color": colours,
-                "line": {
-                    "color": "rgba(8,126,139,0.15)",
-                    "width": 1,
-                },
+                "line": {"width": 0},
             },
             text=[
                 f"{value:.2f}"
@@ -351,42 +395,27 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
             ],
             textposition="outside",
             textfont={
-                "color": "#3E565B",
-                "size": 10,
+                "color": "#31494D",
+                "size": 11,
             },
             customdata=frame[
                 ["Town", "UnitName"]
             ].fillna("").values,
             hovertemplate=(
                 "<b>%{y}</b><br>"
-                "%{customdata[0]}<br><br>"
-                "Latest rainfall: %{x:.2f} %{customdata[1]}"
+                "%{customdata[0]}<br>"
+                "Rainfall: %{x:.2f} %{customdata[1]}"
                 "<extra></extra>"
             ),
         )
     )
 
-    median_value = frame["CurrentValue"].median()
-
-    if pd.notna(median_value):
-        figure.add_vline(
-            x=float(median_value),
-            line_width=1,
-            line_dash="dot",
-            line_color="#8AA09D",
-        )
-
     figure.update_layout(
-        height=430,
+        height=max(320, len(frame) * 34),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#FFFFFF",
-        margin={
-            "l": 10,
-            "r": 44,
-            "t": 18,
-            "b": 42,
-        },
-        bargap=0.32,
+        margin={"l": 15, "r": 55, "t": 15, "b": 45},
+        bargap=0.28,
         showlegend=False,
         font={
             "family": "Inter, Segoe UI, sans-serif",
@@ -394,28 +423,15 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
         },
         xaxis={
             "title": "Latest rainfall reading",
+            "rangemode": "tozero",
             "showgrid": True,
             "gridcolor": "#E7EEEC",
             "zeroline": False,
-            "tickfont": {
-                "color": "#617276",
-                "size": 10,
-            },
         },
         yaxis={
             "autorange": "reversed",
             "showgrid": False,
-            "tickfont": {
-                "color": "#31494D",
-                "size": 11,
-            },
-        },
-        hoverlabel={
-            "bgcolor": "#FFFFFF",
-            "font": {
-                "color": "#12262B",
-            },
-            "bordercolor": "#DCE5E2",
+            "automargin": True,
         },
     )
 
@@ -425,7 +441,7 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
 def build_warning_chart(warnings: pd.DataFrame) -> go.Figure:
     if warnings.empty:
         return _empty_figure(
-            "Flood warning summary is not currently available."
+            "Flood warning information is not currently available."
         )
 
     frame = warnings.copy()
@@ -435,104 +451,143 @@ def build_warning_chart(warnings: pd.DataFrame) -> go.Figure:
         errors="coerce",
     ).fillna(0)
 
-    frame = frame[frame["WarningCount"] >= 0].copy()
+    frame["SeverityText"] = (
+        frame["Severity"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
 
-    if frame.empty:
-        return _empty_figure(
-            "No warning summary records are available."
+    inactive_mask = (
+        frame["SeverityText"]
+        .str.lower()
+        .str.contains(
+            "no longer in force|removed|inactive",
+            regex=True,
+        )
+    )
+
+    active = frame[
+        (~inactive_mask) &
+        (frame["WarningCount"] > 0)
+    ].copy()
+
+    # No active warning state
+    if active.empty:
+        figure = go.Figure()
+
+        figure.add_annotation(
+            x=0.5,
+            y=0.66,
+            xref="paper",
+            yref="paper",
+            text="✓",
+            showarrow=False,
+            font={
+                "size": 40,
+                "color": "#397A5B",
+            },
         )
 
-    if "SeverityLevel" in frame.columns:
-        frame["SeverityLevel"] = pd.to_numeric(
-            frame["SeverityLevel"],
-            errors="coerce",
+        figure.add_annotation(
+            x=0.5,
+            y=0.46,
+            xref="paper",
+            yref="paper",
+            text="<b>No active flood warning</b>",
+            showarrow=False,
+            font={
+                "size": 22,
+                "color": "#12262B",
+            },
         )
 
-        frame = frame.sort_values(
-            ["SeverityLevel", "WarningCount"],
-            ascending=[True, False],
+        latest_state = (
+            frame["SeverityText"].iloc[0]
+            if not frame.empty
+            else "No active warning records"
         )
+
+        figure.add_annotation(
+            x=0.5,
+            y=0.30,
+            xref="paper",
+            yref="paper",
+            text=f"Latest Environment Agency state: {latest_state}",
+            showarrow=False,
+            font={
+                "size": 12,
+                "color": "#617276",
+            },
+        )
+
+        figure.update_layout(
+            height=285,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="#FFFFFF",
+            margin={"l": 20, "r": 20, "t": 15, "b": 15},
+            xaxis={"visible": False},
+            yaxis={"visible": False},
+        )
+
+        return figure
 
     colours = []
 
-    for severity in frame["Severity"].fillna("").astype(str):
-        text_value = severity.lower()
+    for severity in active["SeverityText"]:
+        value = severity.lower()
 
-        if "severe" in text_value:
+        if "severe" in value:
             colours.append("#9F2929")
-        elif "warning" in text_value:
+        elif "warning" in value:
             colours.append("#C96832")
-        elif "alert" in text_value:
+        elif "alert" in value:
             colours.append("#D59A32")
         else:
             colours.append("#557A55")
 
+    active = active.sort_values(
+        "WarningCount",
+        ascending=False,
+    )
+
     figure = go.Figure(
         go.Bar(
-            x=frame["WarningCount"],
-            y=frame["Severity"],
+            x=active["WarningCount"],
+            y=active["SeverityText"],
             orientation="h",
             marker={
                 "color": colours,
-                "line": {
-                    "color": "rgba(18,38,43,0.08)",
-                    "width": 1,
-                },
+                "line": {"width": 0},
             },
-            text=frame["WarningCount"].astype(int),
+            text=active["WarningCount"].astype(int),
             textposition="outside",
-            textfont={
-                "color": "#12262B",
-                "size": 13,
-            },
             hovertemplate=(
                 "<b>%{y}</b><br>"
-                "%{x} current warning records"
+                "%{x} active records"
                 "<extra></extra>"
             ),
         )
     )
 
     figure.update_layout(
-        height=330,
+        height=max(290, len(active) * 65),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#FFFFFF",
-        margin={
-            "l": 10,
-            "r": 48,
-            "t": 16,
-            "b": 38,
-        },
-        bargap=0.36,
+        margin={"l": 15, "r": 50, "t": 15, "b": 40},
+        bargap=0.35,
         showlegend=False,
-        font={
-            "family": "Inter, Segoe UI, sans-serif",
-            "color": "#12262B",
-        },
         xaxis={
-            "title": "Current records",
+            "title": "Active warning records",
+            "rangemode": "tozero",
             "showgrid": True,
             "gridcolor": "#EEE6E2",
             "zeroline": False,
-            "tickfont": {
-                "color": "#617276",
-                "size": 10,
-            },
         },
         yaxis={
             "autorange": "reversed",
             "showgrid": False,
-            "tickfont": {
-                "color": "#31494D",
-                "size": 11,
-            },
-        },
-        hoverlabel={
-            "bgcolor": "#FFFFFF",
-            "font": {
-                "color": "#12262B",
-            },
-            "bordercolor": "#E5D7D1",
+            "automargin": True,
         },
     )
 
@@ -545,12 +600,12 @@ def build_river_history_chart(
 ) -> go.Figure:
     if not river_name:
         return _empty_figure(
-            "Choose a river to explore its recent level history."
+            "Choose a river to explore recent observations."
         )
 
     if history.empty:
         return _empty_figure(
-            f"No historical level readings were returned for {river_name}."
+            f"No level history is currently available for {river_name}."
         )
 
     frame = history.copy()
@@ -566,27 +621,33 @@ def build_river_history_chart(
         errors="coerce",
     )
 
-    frame["TypicalRangeLow"] = pd.to_numeric(
-        frame.get("TypicalRangeLow"),
-        errors="coerce",
-    )
-
-    frame["TypicalRangeHigh"] = pd.to_numeric(
-        frame.get("TypicalRangeHigh"),
-        errors="coerce",
-    )
-
     frame = frame.dropna(
-        subset=[
-            "ReadingDateTimeUTC",
-            "ReadingValue",
-        ]
+        subset=["ReadingDateTimeUTC", "ReadingValue"]
     ).sort_values("ReadingDateTimeUTC")
 
     if frame.empty:
         return _empty_figure(
-            f"No valid historical level readings were returned for {river_name}."
+            f"No valid river level readings were returned for {river_name}."
         )
+
+    low_series = pd.to_numeric(
+        frame.get(
+            "TypicalRangeLow",
+            pd.Series(index=frame.index, dtype=float),
+        ),
+        errors="coerce",
+    )
+
+    high_series = pd.to_numeric(
+        frame.get(
+            "TypicalRangeHigh",
+            pd.Series(index=frame.index, dtype=float),
+        ),
+        errors="coerce",
+    )
+
+    frame["TypicalRangeLow"] = low_series
+    frame["TypicalRangeHigh"] = high_series
 
     figure = go.Figure()
 
@@ -595,71 +656,75 @@ def build_river_history_chart(
         "#557A55",
         "#27A7B8",
         "#766A8A",
-        "#9B704A",
-        "#3F6E73",
     ]
 
-    station_groups = list(
+    groups = list(
         frame.groupby("StationName", dropna=False)
     )
 
-    for index, (station_name, station_frame) in enumerate(station_groups):
-        station_frame = (
-            station_frame
-            .tail(400)
-            .sort_values("ReadingDateTimeUTC")
-            .copy()
-        )
-
-        colour = palette[index % len(palette)]
-
-        valid_low = station_frame["TypicalRangeLow"].dropna()
-        valid_high = station_frame["TypicalRangeHigh"].dropna()
+    # Typical range shading is clearest when one station
+    # is represented for the selected river.
+    if len(groups) == 1:
+        valid_low = frame["TypicalRangeLow"].dropna()
+        valid_high = frame["TypicalRangeHigh"].dropna()
 
         if not valid_low.empty and not valid_high.empty:
             typical_low = float(valid_low.median())
             typical_high = float(valid_high.median())
 
             if typical_high > typical_low:
-                x_values = station_frame["ReadingDateTimeUTC"]
-
-                figure.add_trace(
-                    go.Scatter(
-                        x=x_values,
-                        y=[typical_high] * len(station_frame),
-                        mode="lines",
-                        line={"width": 0},
-                        hoverinfo="skip",
-                        showlegend=False,
-                    )
+                figure.add_hrect(
+                    y0=typical_low,
+                    y1=typical_high,
+                    fillcolor="rgba(39,167,184,0.08)",
+                    line_width=0,
+                    layer="below",
+                    annotation_text="Typical range",
+                    annotation_position="top left",
+                    annotation_font={
+                        "size": 10,
+                        "color": "#55777B",
+                    },
                 )
 
-                figure.add_trace(
-                    go.Scatter(
-                        x=x_values,
-                        y=[typical_low] * len(station_frame),
-                        mode="lines",
-                        line={"width": 0},
-                        fill="tonexty",
-                        fillcolor="rgba(39,167,184,0.055)",
-                        hoverinfo="skip",
-                        showlegend=False,
-                    )
-                )
+    for index, (station_name, station_frame) in enumerate(groups):
+        station_frame = (
+            station_frame
+            .tail(400)
+            .sort_values("ReadingDateTimeUTC")
+        )
+
+        colour = palette[index % len(palette)]
 
         figure.add_trace(
             go.Scatter(
                 x=station_frame["ReadingDateTimeUTC"],
                 y=station_frame["ReadingValue"],
-                mode="lines",
+                mode="lines+markers",
                 name=_safe_text(
                     station_name,
                     "Unknown station",
                 ),
                 line={
-                    "width": 2.5,
+                    "width": 3,
                     "color": colour,
+                    "shape": "spline",
+                    "smoothing": 0.6,
                 },
+                marker={
+                    "size": 5,
+                    "color": "#FFFFFF",
+                    "line": {
+                        "color": colour,
+                        "width": 1.8,
+                    },
+                },
+                fill="tozeroy" if len(groups) == 1 else None,
+                fillcolor=(
+                    "rgba(8,126,139,0.06)"
+                    if len(groups) == 1
+                    else None
+                ),
                 hovertemplate=(
                     "<b>%{fullData.name}</b><br>"
                     "%{x|%d %b %Y, %H:%M}<br>"
@@ -675,43 +740,74 @@ def build_river_history_chart(
             go.Scatter(
                 x=[latest["ReadingDateTimeUTC"]],
                 y=[latest["ReadingValue"]],
-                mode="markers",
+                mode="markers+text",
                 marker={
-                    "size": 10,
+                    "size": 12,
                     "color": colour,
                     "line": {
                         "color": "#FFFFFF",
-                        "width": 2,
+                        "width": 2.5,
                     },
                 },
-                hovertemplate=(
-                    "<b>Latest observation</b><br>"
-                    "%{x|%d %b %Y, %H:%M}<br>"
-                    "%{y:.3f}"
-                    "<extra></extra>"
-                ),
+                text=[
+                    f'{latest["ReadingValue"]:.3f}'
+                ],
+                textposition="top center",
+                textfont={
+                    "size": 11,
+                    "color": "#12262B",
+                },
                 showlegend=False,
+                hoverinfo="skip",
             )
         )
 
+    observed_min = float(frame["ReadingValue"].min())
+    observed_max = float(frame["ReadingValue"].max())
+
+    spread = observed_max - observed_min
+
+    if spread <= 0:
+        padding = max(abs(observed_max) * 0.20, 0.05)
+    else:
+        padding = max(spread * 0.20, 0.03)
+
+    y_min = max(0, observed_min - padding)
+    y_max = observed_max + padding
+
+    # Include typical limits only when reasonably close to the
+    # observed data, so extreme metadata does not flatten the chart.
+    typical_values = pd.concat(
+        [
+            frame["TypicalRangeLow"],
+            frame["TypicalRangeHigh"],
+        ]
+    ).dropna()
+
+    if not typical_values.empty:
+        typical_min = float(typical_values.min())
+        typical_max = float(typical_values.max())
+
+        if typical_min >= y_min - spread and typical_max <= y_max + max(spread, 0.1) * 2:
+            y_min = max(
+                0,
+                min(y_min, typical_min - padding),
+            )
+            y_max = max(
+                y_max,
+                typical_max + padding,
+            )
+
     figure.update_layout(
-        title={
-            "text": f"{river_name} · recent level observations",
-            "x": 0,
-            "xanchor": "left",
-            "font": {
-                "size": 15,
-                "color": "#12262B",
-            },
-        },
-        height=440,
+        title=None,
+        height=400,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#FFFFFF",
         margin={
             "l": 58,
             "r": 25,
-            "t": 68,
-            "b": 52,
+            "t": 42,
+            "b": 50,
         },
         hovermode="x unified",
         font={
@@ -721,7 +817,7 @@ def build_river_history_chart(
         legend={
             "orientation": "h",
             "yanchor": "bottom",
-            "y": 1.02,
+            "y": 1.03,
             "xanchor": "right",
             "x": 1,
             "font": {
@@ -733,6 +829,7 @@ def build_river_history_chart(
             "showgrid": False,
             "zeroline": False,
             "linecolor": "#DCE5E2",
+            "tickformat": "%d %b",
             "tickfont": {
                 "color": "#617276",
                 "size": 10,
@@ -740,8 +837,9 @@ def build_river_history_chart(
         },
         yaxis={
             "title": "River level",
+            "range": [y_min, y_max],
             "showgrid": True,
-            "gridcolor": "#E7EEEC",
+            "gridcolor": "#E5ECEA",
             "gridwidth": 1,
             "zeroline": False,
             "linecolor": "#DCE5E2",
@@ -749,13 +847,6 @@ def build_river_history_chart(
                 "color": "#617276",
                 "size": 10,
             },
-        },
-        hoverlabel={
-            "bgcolor": "#FFFFFF",
-            "font": {
-                "color": "#12262B",
-            },
-            "bordercolor": "#DCE5E2",
         },
     )
 

@@ -790,3 +790,162 @@ body {
         padding-right: 14px !important;
     }
 }
+
+/* ==========================================================
+   FINAL PRESENTATION REFINEMENT
+   ========================================================== */
+
+/* Technology belongs near the top */
+.technology-stack {
+    order: 1 !important;
+    grid-column: 1 / -1 !important;
+
+    margin: 18px 0 0 !important;
+    padding: 14px 20px !important;
+
+    background: #12262b !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+}
+
+.technology-copy > span {
+    color: #69c7cf !important;
+}
+
+.technology-copy strong {
+    color: #ffffff !important;
+}
+
+.technology-copy p {
+    color: rgba(255,255,255,0.65) !important;
+}
+
+.technology-pills {
+    gap: 8px !important;
+}
+
+.technology-pills span {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+}
+
+/* Compact masthead */
+.hero {
+    order: 2 !important;
+    padding: 28px 34px !important;
+    margin-top: 0 !important;
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 3.5vw, 3.4rem) !important;
+}
+
+.hero-copy > p {
+    margin-bottom: 0 !important;
+}
+
+/* KPI row rather than sidebar */
+.metric-grid {
+    order: 3 !important;
+    grid-column: 1 / -1 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+}
+
+.metric-card {
+    min-height: 110px !important;
+}
+
+/* Map and rainfall no longer share a narrow row */
+.map-rain-grid {
+    order: 4 !important;
+    grid-column: 1 / -1 !important;
+
+    display: block !important;
+}
+
+.map-rain-grid .panel:first-child {
+    width: 100% !important;
+    min-height: 560px !important;
+    margin-bottom: 20px !important;
+}
+
+/* rainfall moves later and gets usable width */
+.map-rain-grid .panel:last-child {
+    display: none !important;
+}
+
+/* River explorer */
+.river-section {
+    order: 5 !important;
+    grid-column: 1 / -1 !important;
+    grid-template-columns: 1fr !important;
+}
+
+.river-section .pulse-panel {
+    margin-top: 0 !important;
+}
+
+/* Risk area */
+.risk-grid {
+    order: 7 !important;
+    grid-column: 1 / -1 !important;
+    grid-template-columns: 0.9fr 1.1fr !important;
+}
+
+/* Pipeline stays compact */
+.operations-section {
+    order: 8 !important;
+}
+
+/* The large architecture diagram does not belong in the
+   primary operational dashboard */
+.architecture-section {
+    display: none !important;
+}
+
+/* Footer */
+.footer {
+    margin-top: 0 !important;
+}
+
+/* Stronger cards */
+.panel {
+    padding: 24px !important;
+}
+
+.section-heading {
+    margin-bottom: 18px !important;
+}
+
+.section-heading h2 {
+    font-size: clamp(1.55rem, 2vw, 2.15rem) !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .metric-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .risk-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .metric-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Final rainfall placement */
+.map-rain-grid .panel:last-child {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+    border-top: 4px solid #27A7B8 !important;
+}
