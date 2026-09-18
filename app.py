@@ -305,17 +305,64 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
         errors="coerce",
     )
 
-    frame = frame.dropna(subset=["CurrentValue"]).copy()
+    frame = frame.dropna(
+        subset=["CurrentValue"]
+    ).copy()
 
     if frame.empty:
         return _empty_figure(
             "No valid rainfall observations are currently available."
         )
 
-    # If every reporting station is currently at zero, do not draw
-    # a meaningless bar chart.
-    if float(frame["CurrentValue"].max()) <= 0:
+    # Keep one current observation per physical monitoring station.
+    # The Environment Agency feed can expose more than one rainfall
+    # measure for the same station.
+    if "StationKey" in frame.columns:
+        if "ReadingDateTimeUTC" in frame.columns:
+            frame["_ObservedUTC"] = pd.to_datetime(
+                frame["ReadingDateTimeUTC"],
+                errors="coerce",
+                utc=True,
+            )
+
+            frame = (
+                frame
+                .sort_values(
+                    ["_ObservedUTC", "CurrentValue"],
+                    na_position="first",
+                )
+                .drop_duplicates(
+                    subset=["StationKey"],
+                    keep="last",
+                )
+            )
+        else:
+            frame = frame.drop_duplicates(
+                subset=["StationKey"],
+                keep="last",
+            )
+
+    positive = frame[
+        frame["CurrentValue"] > 0
+    ].copy()
+
+    if positive.empty:
         figure = go.Figure()
+
+        unit = ""
+
+        if "UnitName" in frame.columns:
+            units = (
+                frame["UnitName"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+            )
+
+            units = units[units.ne("")]
+
+            if not units.empty:
+                unit = f" {units.mode().iloc[0]}"
 
         figure.add_annotation(
             x=0.5,
@@ -336,8 +383,8 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
             xref="paper",
             yref="paper",
             text=(
-                "Latest monitoring station observations "
-                "are currently reporting 0.00."
+                "Latest reporting stations are currently "
+                f"recording 0.00{unit}."
             ),
             showarrow=False,
             font={
@@ -350,93 +397,263 @@ def build_rainfall_chart(rainfall: pd.DataFrame) -> go.Figure:
             height=300,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="#FFFFFF",
-            margin={"l": 20, "r": 20, "t": 20, "b": 20},
+            margin={
+                "l": 20,
+                "r": 20,
+                "t": 20,
+                "b": 20,
+            },
             xaxis={"visible": False},
             yaxis={"visible": False},
         )
 
         return figure
 
+    # Select the highest current readings, then arrange them so that
+    # the largest value appears at the top of the horizontal chart.
     frame = (
-        frame[frame["CurrentValue"] > 0]
-        .sort_values("CurrentValue", ascending=False)
+        positive
+        .sort_values(
+            "CurrentValue",
+            ascending=False,
+        )
         .head(10)
         .copy()
     )
 
-    labels = (
-        frame["StationName"]
-        .fillna("Unknown station")
+    def display_station(row) -> str:
+        name = str(
+            row.get("StationName")
+            if pd.notna(row.get("StationName"))
+            else ""
+        ).strip()
+
+        town = str(
+            row.get("Town")
+            if pd.notna(row.get("Town"))
+            else ""
+        ).strip()
+
+        station_key = str(
+            row.get("StationKey")
+            if pd.notna(row.get("StationKey"))
+            else ""
+        ).strip()
+
+        generic_name = (
+            not name
+            or name.lower() == "unknown station"
+            or name.lower().startswith("rainfall station")
+        )
+
+        if generic_name and town:
+            return town
+
+        if generic_name and station_key:
+            return f"EA station {station_key}"
+
+        if name:
+            return name
+
+        if town:
+            return town
+
+        if station_key:
+            return f"EA station {station_key}"
+
+        return "Monitoring station"
+
+    frame["_DisplayStation"] = frame.apply(
+        display_station,
+        axis=1,
+    )
+
+    # If towns or station names are still duplicated, append the
+    # station reference/key so every Plotly category is unique.
+    duplicate_labels = frame[
+        "_DisplayStation"
+    ].duplicated(keep=False)
+
+    if duplicate_labels.any():
+        def make_unique(row) -> str:
+            label = row["_DisplayStation"]
+
+            if not duplicate_labels.loc[row.name]:
+                return label
+
+            station_key = row.get("StationKey")
+
+            if pd.notna(station_key):
+                return f"{label} · {station_key}"
+
+            return label
+
+        frame["_DisplayStation"] = frame.apply(
+            make_unique,
+            axis=1,
+        )
+
+    if "ReadingDateTimeUTC" in frame.columns:
+        observed = pd.to_datetime(
+            frame["ReadingDateTimeUTC"],
+            errors="coerce",
+            utc=True,
+        )
+
+        frame["_ObservedLabel"] = (
+            observed
+            .dt.strftime("%d %b %Y, %H:%M UTC")
+            .fillna("Not available")
+        )
+    else:
+        frame["_ObservedLabel"] = "Not available"
+
+    if "Town" not in frame.columns:
+        frame["Town"] = ""
+
+    if "UnitName" not in frame.columns:
+        frame["UnitName"] = ""
+
+    if "StationKey" not in frame.columns:
+        frame["StationKey"] = ""
+
+    unit_values = (
+        frame["UnitName"]
+        .dropna()
         .astype(str)
+        .str.strip()
+    )
+
+    unit_values = unit_values[
+        unit_values.ne("")
+    ]
+
+    common_unit = (
+        unit_values.mode().iloc[0]
+        if not unit_values.empty
+        else ""
+    )
+
+    frame = frame.sort_values(
+        "CurrentValue",
+        ascending=True,
     )
 
     colours = []
 
-    for rank in range(len(frame)):
-        if rank == 0:
+    count = len(frame)
+
+    for position in range(count):
+        rank_from_top = count - position - 1
+
+        if rank_from_top == 0:
             colours.append("#087E8B")
-        elif rank < 4:
+        elif rank_from_top < 4:
             colours.append("#27A7B8")
         else:
             colours.append("#A6D6DA")
 
+    text_values = []
+
+    for _, row in frame.iterrows():
+        row_unit = str(
+            row.get("UnitName") or common_unit
+        ).strip()
+
+        suffix = (
+            f" {row_unit}"
+            if row_unit
+            else ""
+        )
+
+        text_values.append(
+            f'{row["CurrentValue"]:.2f}{suffix}'
+        )
+
+    customdata = frame[
+        [
+            "Town",
+            "UnitName",
+            "_ObservedLabel",
+            "StationKey",
+        ]
+    ].fillna("").values
+
     figure = go.Figure(
         go.Bar(
             x=frame["CurrentValue"],
-            y=labels,
+            y=frame["_DisplayStation"],
             orientation="h",
             marker={
                 "color": colours,
                 "line": {"width": 0},
             },
-            text=[
-                f"{value:.2f}"
-                for value in frame["CurrentValue"]
-            ],
+            text=text_values,
             textposition="outside",
             textfont={
                 "color": "#31494D",
-                "size": 11,
+                "size": 12,
             },
-            customdata=frame[
-                ["Town", "UnitName"]
-            ].fillna("").values,
+            cliponaxis=False,
+            customdata=customdata,
             hovertemplate=(
                 "<b>%{y}</b><br>"
-                "%{customdata[0]}<br>"
-                "Rainfall: %{x:.2f} %{customdata[1]}"
+                "Area: %{customdata[0]}<br>"
+                "Rainfall: %{x:.2f} %{customdata[1]}<br>"
+                "Observed: %{customdata[2]}"
                 "<extra></extra>"
             ),
         )
     )
 
+    axis_title = (
+        f"Rainfall ({common_unit})"
+        if common_unit
+        else "Rainfall"
+    )
+
     figure.update_layout(
-        height=max(320, len(frame) * 34),
+        height=max(
+            340,
+            100 + len(frame) * 34,
+        ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="#FFFFFF",
-        margin={"l": 15, "r": 55, "t": 15, "b": 45},
-        bargap=0.28,
+        margin={
+            "l": 20,
+            "r": 85,
+            "t": 15,
+            "b": 55,
+        },
+        bargap=0.32,
         showlegend=False,
         font={
             "family": "Inter, Segoe UI, sans-serif",
             "color": "#12262B",
         },
         xaxis={
-            "title": "Latest rainfall reading",
+            "title": axis_title,
             "rangemode": "tozero",
             "showgrid": True,
-            "gridcolor": "#E7EEEC",
+            "gridcolor": "#E5ECEA",
             "zeroline": False,
+            "automargin": True,
         },
         yaxis={
-            "autorange": "reversed",
+            "title": None,
             "showgrid": False,
             "automargin": True,
+        },
+        hoverlabel={
+            "bgcolor": "#FFFFFF",
+            "font": {
+                "color": "#12262B",
+            },
+            "bordercolor": "#DCE5E2",
         },
     )
 
     return figure
-
 
 def build_warning_chart(warnings: pd.DataFrame) -> go.Figure:
     if warnings.empty:
@@ -1098,8 +1315,11 @@ app.layout = html.Div(
                                         ),
                                         html.Div(
                                             children=[
-                                                html.Span("Warehouse"),
-                                                html.Strong("Azure SQL"),
+                                                html.Span("Serving mode"),
+                                                html.Strong(
+                                                    "Connecting",
+                                                    id="hero-serving-mode",
+                                                ),
                                             ]
                                         ),
                                         html.Div(
@@ -1317,8 +1537,8 @@ app.layout = html.Div(
                             children=[
                                 _section_heading(
                                     "Rainfall monitoring",
-                                    "Latest rainfall observations",
-                                    "Highest current rainfall readings across the monitored station network.",
+                                    "Highest current rainfall readings",
+                                    "Latest reported rainfall across monitored Environment Agency stations.",
                                 ),
                                 dcc.Loading(
                                     children=dcc.Graph(
@@ -1534,6 +1754,7 @@ app.layout = html.Div(
     Output("metric-latest", "children"),
     Output("metric-latest-detail", "children"),
     Output("hero-latest-observation", "children"),
+    Output("hero-serving-mode", "children"),
     Output("hero-station-count", "children"),
     Output("station-map", "figure"),
     Output("rainfall-chart", "figure"),
@@ -1559,13 +1780,33 @@ def refresh_dashboard(
 ):
     try:
         snapshot = load_dashboard_snapshot()
-        river_names = get_river_names()
 
         current = snapshot["current"]
         high_levels = snapshot["high_levels"]
         rainfall = snapshot["rainfall"]
         warnings = snapshot["warnings"]
         etl = snapshot["etl"]
+        data_source = snapshot.get("_source", "azure_sql")
+
+        serving_mode = (
+            "Live API"
+            if data_source == "environment_agency"
+            else "Azure SQL"
+        )
+
+        river_names = (
+            sorted(
+                current["RiverName"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .loc[lambda values: values.ne("")]
+                .unique()
+                .tolist()
+            )
+            if not current.empty and "RiverName" in current.columns
+            else []
+        )
 
         station_count = (
             int(current["StationKey"].nunique())
@@ -1623,14 +1864,39 @@ def refresh_dashboard(
             else "Not available"
         )
 
-        etl_status, refreshed, rows_loaded, duration, etl_message = summarise_etl(etl)
-        etl_class = (
-            "etl-status healthy"
-            if etl_status in {"SUCCEEDED", "SUCCESS", "COMPLETED"}
-            else "etl-status failed"
-            if etl_status in {"FAILED", "FAILURE", "ERROR"}
-            else "etl-status unknown"
-        )
+        if data_source == "environment_agency":
+            etl_status = "LIVE"
+            etl_class = "etl-status healthy"
+            etl_message = (
+                "Current observations are live and up to date."
+            )
+            refreshed = latest_text
+            rows_loaded = "Live"
+            duration = "—"
+        else:
+            (
+                etl_status,
+                refreshed,
+                rows_loaded,
+                duration,
+                etl_message,
+            ) = summarise_etl(etl)
+
+            etl_class = (
+                "etl-status healthy"
+                if etl_status in {
+                    "SUCCEEDED",
+                    "SUCCESS",
+                    "COMPLETED",
+                }
+                else "etl-status failed"
+                if etl_status in {
+                    "FAILED",
+                    "FAILURE",
+                    "ERROR",
+                }
+                else "etl-status unknown"
+            )
 
         options = [{"label": name, "value": name} for name in river_names]
         selected = current_river if current_river in river_names else (
@@ -1649,6 +1915,7 @@ def refresh_dashboard(
             latest_short,
             latest_text,
             latest_text,
+            serving_mode,
             f"{station_count:,}",
             build_station_map(current),
             build_rainfall_chart(rainfall),
@@ -1678,17 +1945,18 @@ def refresh_dashboard(
         )
 
         return (
-            "Data connection unavailable",
+            "Live data temporarily unavailable",
             "status-chip offline",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
             "Waiting for live observations",
             "Waiting for live data",
+            "Unavailable",
             "—",
             empty_map,
             empty_rain,
@@ -1697,7 +1965,7 @@ def refresh_dashboard(
             [],
             "UNAVAILABLE",
             "etl-status failed",
-            message,
+            "Live data temporarily unavailable. Please try again shortly.",
             "—",
             "—",
             "—",
@@ -1751,7 +2019,7 @@ def refresh_selected_river(river_name: str | None):
                 f"{river_name} data could not be loaded. The platform will retry on the next refresh."
             ),
             [],
-            str(exc),
+            "Live river data is temporarily unavailable. Please try again shortly.",
         )
 
 
