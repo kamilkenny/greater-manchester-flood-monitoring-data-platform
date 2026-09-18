@@ -1559,13 +1559,27 @@ def refresh_dashboard(
 ):
     try:
         snapshot = load_dashboard_snapshot()
-        river_names = get_river_names()
 
         current = snapshot["current"]
         high_levels = snapshot["high_levels"]
         rainfall = snapshot["rainfall"]
         warnings = snapshot["warnings"]
         etl = snapshot["etl"]
+        data_source = snapshot.get("_source", "azure_sql")
+
+        river_names = (
+            sorted(
+                current["RiverName"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .loc[lambda values: values.ne("")]
+                .unique()
+                .tolist()
+            )
+            if not current.empty and "RiverName" in current.columns
+            else []
+        )
 
         station_count = (
             int(current["StationKey"].nunique())
@@ -1623,14 +1637,39 @@ def refresh_dashboard(
             else "Not available"
         )
 
-        etl_status, refreshed, rows_loaded, duration, etl_message = summarise_etl(etl)
-        etl_class = (
-            "etl-status healthy"
-            if etl_status in {"SUCCEEDED", "SUCCESS", "COMPLETED"}
-            else "etl-status failed"
-            if etl_status in {"FAILED", "FAILURE", "ERROR"}
-            else "etl-status unknown"
-        )
+        if data_source == "environment_agency":
+            etl_status = "LIVE"
+            etl_class = "etl-status healthy"
+            etl_message = (
+                "Current observations are live and up to date."
+            )
+            refreshed = latest_text
+            rows_loaded = "Live"
+            duration = "—"
+        else:
+            (
+                etl_status,
+                refreshed,
+                rows_loaded,
+                duration,
+                etl_message,
+            ) = summarise_etl(etl)
+
+            etl_class = (
+                "etl-status healthy"
+                if etl_status in {
+                    "SUCCEEDED",
+                    "SUCCESS",
+                    "COMPLETED",
+                }
+                else "etl-status failed"
+                if etl_status in {
+                    "FAILED",
+                    "FAILURE",
+                    "ERROR",
+                }
+                else "etl-status unknown"
+            )
 
         options = [{"label": name, "value": name} for name in river_names]
         selected = current_river if current_river in river_names else (
@@ -1678,14 +1717,14 @@ def refresh_dashboard(
         )
 
         return (
-            "Data connection unavailable",
+            "Live data temporarily unavailable",
             "status-chip offline",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
-            "Waiting for Azure SQL",
+            "Waiting for live observations",
             "—",
             "Waiting for live observations",
             "Waiting for live data",
@@ -1697,7 +1736,7 @@ def refresh_dashboard(
             [],
             "UNAVAILABLE",
             "etl-status failed",
-            message,
+            "Live data temporarily unavailable. Please try again shortly.",
             "—",
             "—",
             "—",
@@ -1751,7 +1790,7 @@ def refresh_selected_river(river_name: str | None):
                 f"{river_name} data could not be loaded. The platform will retry on the next refresh."
             ),
             [],
-            str(exc),
+            "Live river data is temporarily unavailable. Please try again shortly.",
         )
 
 

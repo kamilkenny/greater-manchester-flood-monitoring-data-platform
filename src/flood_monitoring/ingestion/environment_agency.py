@@ -61,3 +61,23 @@ class EnvironmentAgencyClient:
                 "_limit": 20000,
             },
         )
+
+    def fetch_station_readings(
+        self,
+        station_reference: str,
+        start_date: str,
+        end_date: str,
+        limit: int = 2500,
+    ) -> dict[str, Any]:
+        return self._get(
+            "/data/readings",
+            {
+                "stationReference": station_reference,
+                "parameter": "level",
+                "startdate": start_date,
+                "enddate": end_date,
+                "_view": "full",
+                "_sorted": "",
+                "_limit": max(100, min(int(limit), 5000)),
+            },
+        )
