@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from flood_monitoring.config import Settings
 
@@ -11,6 +13,39 @@ class EnvironmentAgencyClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.session = requests.Session()
+
+        retry = Retry(
+            total=2,
+            connect=1,
+            read=1,
+            status=2,
+            backoff_factor=0.75,
+            status_forcelist=(
+                429,
+                500,
+                502,
+                503,
+                504,
+            ),
+            allowed_methods={"GET"},
+            respect_retry_after_header=True,
+            raise_on_status=False,
+        )
+
+        adapter = HTTPAdapter(
+            max_retries=retry,
+        )
+
+        self.session.mount(
+            "https://",
+            adapter,
+        )
+
+        self.session.mount(
+            "http://",
+            adapter,
+        )
+
         self.session.headers.update(
             {
                 "User-Agent":
@@ -26,7 +61,7 @@ class EnvironmentAgencyClient:
         response = self.session.get(
             f"{self.settings.api_base_url}{endpoint}",
             params=params,
-            timeout=self.settings.request_timeout_seconds,
+            timeout=(5, 15),
         )
         response.raise_for_status()
         return response.json()
