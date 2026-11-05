@@ -1,5 +1,7 @@
+
 # Greater Manchester Flood & River Monitoring Data Platform
 
+<img width="956" height="787" alt="GM rivers" src="https://github.com/user-attachments/assets/f60c9ac0-47f0-45eb-88b1-214ba3230778" />
 
 ## Public Flood Intelligence Dashboard
 
